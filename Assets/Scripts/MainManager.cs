@@ -10,7 +10,11 @@ public class MainManager : MonoBehaviour
     public int LineCount = 6;
     public Rigidbody Ball;
 
+    public string bestPlayerName;
+    public string playerName = "NaN";
+    public int highestScore = 0;
     public Text ScoreText;
+    public Text HighScoreText;
     public GameObject GameOverText;
     
     private bool m_Started = false;
@@ -22,6 +26,14 @@ public class MainManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //Pull information from HighscoreManager Instance
+        if (HighScoreManager.Instance != null)
+        {
+            playerName = HighScoreManager.Instance.currentPlayerName;
+            bestPlayerName = HighScoreManager.Instance.bestPlayerName;
+            highestScore = HighScoreManager.Instance.bestScore;
+            HighScoreText.text = "Best Score: " + bestPlayerName + " : " + highestScore;
+        }
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -72,5 +84,13 @@ public class MainManager : MonoBehaviour
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+        //Store information back into the Highscore Manager Instance.
+        if(m_Points > highestScore)
+        {
+            HighScoreManager.Instance.bestScore = m_Points;
+            HighScoreManager.Instance.bestPlayerName = playerName;
+        }
+        HighScoreManager.Instance.AddScore(playerName, m_Points);
+        HighScoreManager.Instance.SaveScores();
     }
 }
